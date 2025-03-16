@@ -53,7 +53,7 @@ router.post("/login", async (req, res) => {
 });
 
 router.get('/profile', verifyToken, isAdmin, async (req, res) => {
-  res.json(req.user);
+  res.json(req.user); 
 });
 
 router.get("/all", verifyToken, isAdmin, async (req, res) => {
