@@ -10,6 +10,7 @@ import Chat from "./components/Caht";
 import Projet from "./components/Projet";
 import Taches from "./components/Taches";
 import MangeUser from "./components/MangeUser";
+import UpdateUser from "./components/UpdateUser";
 
 function App() {
   return (
@@ -21,7 +22,8 @@ function App() {
             <Route path="/" element={<Home/>} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
-            <Route path="/mange_user" element={<PrivateRoute><MangeUser /></PrivateRoute>} />
+            <Route path="/mange_users" element={<PrivateRoute><MangeUser /></PrivateRoute>} />
+            <Route path="/update_user/:id" element={<PrivateRoute><UpdateUser /></PrivateRoute>} />
             <Route path="/chat" element={<PrivateRoute><Chat /></PrivateRoute>} />
             <Route path="/projets" element={<PrivateRoute><Projet /></PrivateRoute>} />
             <Route path="/taches" element={<PrivateRoute><Taches /></PrivateRoute>} />

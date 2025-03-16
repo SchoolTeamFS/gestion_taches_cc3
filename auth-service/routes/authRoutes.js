@@ -64,6 +64,15 @@ router.get("/all", verifyToken, isAdmin, async (req, res) => {
     res.status(500).json({ msg: "Server error", detail: err.message });
   }
 });
+router.get("/:id", verifyToken, isAdmin, async (req, res) => {
+  try {
+    const user = await User.findOne({_id: req.params.id});
+    if(!user) return res.status(404).json({msg: 'user not found'})
+    res.json(user);
+  } catch (err) {
+    res.status(500).json({ msg: "Server error", detail: err.message });
+  }
+});
 
 router.put("/update/:id", verifyToken, isAdmin, async (req, res) => {
   try {
@@ -82,7 +91,7 @@ router.put("/update/:id", verifyToken, isAdmin, async (req, res) => {
 
 router.delete("/delete/:id", verifyToken, isAdmin, async (req, res) => {
   try {
-    const result = await User.deleteOne({ _id: req.params.id });
+    const result = await User.findOneAndDelete({ _id: req.params.id });
 
   if (result.deletedCount === 0) {
     return res.status(404).json({ message: "User not found" });

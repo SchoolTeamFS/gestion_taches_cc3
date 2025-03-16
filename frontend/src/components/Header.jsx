@@ -44,7 +44,7 @@ const Header = () => {
         <li><Link to="/projets" style={styles.link}>Projet</Link></li>
         <li><Link to="/taches" style={styles.link}>Taches</Link></li>
         {user && user.role === "admin" ? (
-        <li><Link to="/mange_user" style={styles.link}>Mange User</Link></li>
+        <li><Link to="/mange_users" style={styles.link}>Mange User</Link></li>
         ): "" }
         {user ? (
           <li><button onClick={logout} style={styles.button}>Logout</button></li>
