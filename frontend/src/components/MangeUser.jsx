@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
-import authApi from '../api/authApi'
+import authApi from '../api/authApi';
 import { useNavigate } from "react-router-dom";
 
 const ManageUser = () => {
     const [users, setUsers] = useState([]);
     const [error, setError] = useState('');
-    const navigate = useNavigate()
+    const navigate = useNavigate();
 
     useEffect(() => {
         fetchUsers();
@@ -16,7 +16,7 @@ const ManageUser = () => {
             const token = localStorage.getItem("token");
             const response = await authApi.get("/auth/all", {
                 headers: {
-                    Authorization: `Bearer ${token}` 
+                    Authorization: `Bearer ${token}`
                 }
             });
             setUsers(response.data);
@@ -24,59 +24,115 @@ const ManageUser = () => {
             setError("Error fetching users");
         }
     };
-    console.log(users)
-    const handleupt=(id)=>{
-        navigate(`/update_user/${id}`)
-    }
-    // const handleupt=(id)=>{
-    //     try {
-    //         const token = localStorage.getItem("token");
-    //         const response = authApi.put(`/auth/update/${id}`, {
-    //             headers: {
-    //                 Authorization: `Bearer ${token}` 
-    //             }
-    //         });
-    //         setUsers(response.data);
-    //     } catch (error) {
-    //         setError("Error updating user");
-    //     }
-    // }
-    const handledel=(id)=>{
+
+    const handleUpdate = (id) => {
+        navigate(`/update_user/${id}`);
+    };
+
+    const handleDelete = async (id) => {
         try {
             const token = localStorage.getItem("token");
-            const response = authApi.delete(`/auth/delete/${id}`, {
-                headers: {
-                    Authorization: `Bearer ${token}` 
-                }
+            await authApi.delete(`/auth/delete/${id}`, {
+                headers: { Authorization: `Bearer ${token}` }
             });
-        fetchUsers();
-
+            fetchUsers();
         } catch (error) {
             setError("Error deleting user");
         }
-    }
+    };
+
+    const styles = {
+        container: {
+            maxWidth: "800px",
+            margin: "20px auto",
+            padding: "20px",
+            backgroundColor: "#f9f9f9",
+            borderRadius: "8px",
+            boxShadow: "0px 4px 10px rgba(0,0,0,0.1)",
+            textAlign: "center"
+        },
+        table: {
+            width: "100%",
+            borderCollapse: "collapse",
+            marginTop: "20px",
+        },
+        th: {
+            backgroundColor: "#333",
+            color: "white",
+            padding: "12px",
+            textAlign: "left",
+        },
+        td: {
+            border: "1px solid #ddd",
+            padding: "10px",
+            textAlign: "left",
+        },
+        button: {
+            padding: "8px 12px",
+            fontSize: "14px",
+            border: "none",
+            borderRadius: "5px",
+            cursor: "pointer",
+            transition: "background 0.3s",
+            marginRight: "5px",
+        },
+        updateButton: {
+            backgroundColor: "#007BFF",
+            color: "white",
+        },
+        updateButtonHover: {
+            backgroundColor: "#0056b3",
+        },
+        deleteButton: {
+            backgroundColor: "#DC3545",
+            color: "white",
+        },
+        deleteButtonHover: {
+            backgroundColor: "#a71d2a",
+        },
+        error: {
+            color: "red",
+            fontSize: "14px",
+            marginBottom: "10px",
+        },
+    };
+
     return (
-        <div>
-            {error && <p style={{ color: "red" }}>{error}</p>}
-            <table border="1">
+        <div style={styles.container}>
+            <h2>Manage Users</h2>
+            {error && <p style={styles.error}>{error}</p>}
+            <table style={styles.table}>
                 <thead>
                     <tr>
-                        <th>Name</th>
-                        <th>Email</th>
-                        <th>Role</th>
-                        <th>Actions</th>
+                        <th style={styles.th}>Name</th>
+                        <th style={styles.th}>Email</th>
+                        <th style={styles.th}>Role</th>
+                        <th style={styles.th}>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     {users.map((user) => (
                         <tr key={user._id}>
-                            <td>{user.name}</td>
-                            <td>{user.email}</td>
-                            <td>{user.role}</td>
-                            <td>
-                                {/* <button type="button" onClick={()=>handleupt(user._id)}>Update</button> */}
-                                <button type="button" onClick={()=>handleupt(user._id)}>Update</button>
-                                <button type="button" onClick={()=>handledel(user._id)}>Delete</button>
+                            <td style={styles.td}>{user.name}</td>
+                            <td style={styles.td}>{user.email}</td>
+                            <td style={styles.td}>{user.role}</td>
+                            <td style={styles.td}>
+                                <button
+                                    style={{ ...styles.button, ...styles.updateButton }}
+                                    onMouseEnter={(e) => e.target.style.backgroundColor = styles.updateButtonHover.backgroundColor}
+                                    onMouseLeave={(e) => e.target.style.backgroundColor = styles.updateButton.backgroundColor}
+                                    onClick={() => handleUpdate(user._id)}
+                                >
+                                    Update
+                                </button>
+                                <button
+                                    style={{ ...styles.button, ...styles.deleteButton }}
+                                    onMouseEnter={(e) => e.target.style.backgroundColor = styles.deleteButtonHover.backgroundColor}
+                                    onMouseLeave={(e) => e.target.style.backgroundColor = styles.deleteButton.backgroundColor}
+                                    onClick={() => handleDelete(user._id)}
+                                >
+                                    Delete
+                                </button>
                             </td>
                         </tr>
                     ))}
