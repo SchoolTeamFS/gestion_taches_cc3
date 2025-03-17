@@ -6,16 +6,20 @@ import { ImBlocked } from "react-icons/im";
 const ManageUser = () => {
     const [users, setUsers] = useState([]);
     const [error, setError] = useState('');
+    const [search, setSearch] = useState(''); 
     const navigate = useNavigate();
 
     useEffect(() => {
         fetchUsers();
     }, []);
 
-    const fetchUsers = async () => {
+    const fetchUsers = async (keyword = '') => {
         try {
             const token = localStorage.getItem("token");
-            const response = await authApi.get("/auth/all", {
+            console.log("Token:", token); 
+            const formattedKeyword = keyword.trim();
+            const url = formattedKeyword ? `/auth/${formattedKeyword}/search` : "/auth/all";  
+            const response = await authApi.get(url, {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
@@ -23,7 +27,14 @@ const ManageUser = () => {
             setUsers(response.data);
         } catch (error) {
             setError("Error fetching users");
+            console.log(error)
         }
+    };
+
+    const handleSearchChange = (event) => {
+        const keyword = event.target.value;
+        setSearch(keyword);
+        fetchUsers(keyword);  
     };
 
     const handleUpdate = (id) => {
@@ -36,18 +47,19 @@ const ManageUser = () => {
             await authApi.delete(`/auth/delete/${id}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
-            fetchUsers();
+            fetchUsers(); 
         } catch (error) {
             setError("Error deleting user");
         }
     };
+
     const ToggleBlock = async (id) => {
         try {
             const token = localStorage.getItem("token");
             await authApi.patch(`/auth/${id}/ToggleBlock`, {}, {
                 headers: { Authorization: `Bearer ${token}` }
             });
-            fetchUsers();
+            fetchUsers();  // Refresh the users list after toggling block status
         } catch (error) {
             setError("Error toggling block.");
         }
@@ -106,16 +118,34 @@ const ManageUser = () => {
             fontSize: "14px",
             marginBottom: "10px",
         },
+        searchInput: {
+            padding: "8px 12px",
+            width: "80%",
+            marginBottom: "20px",
+            borderRadius: "5px",
+            border: "1px solid #ddd",
+            fontSize: "14px",
+            marginRight: "10px",
+        },
     };
 
     return (
         <div style={styles.container}>
             <h2>Manage Users</h2>
             {error && <p style={styles.error}>{error}</p>}
+
+            <input
+                type="text"
+                value={search}
+                onChange={handleSearchChange}
+                placeholder="Search by name, email or role"
+                style={styles.searchInput}
+            />
+
             <table style={styles.table}>
                 <thead>
                     <tr>
-                        <th style={styles.th}>block</th>
+                        <th style={styles.th}>Block</th>
                         <th style={styles.th}>Name</th>
                         <th style={styles.th}>Email</th>
                         <th style={styles.th}>Role</th>
@@ -125,7 +155,9 @@ const ManageUser = () => {
                 <tbody>
                     {users.map((user) => (
                         <tr key={user._id}>
-                            <td style={{ ...styles.td, cursor: "pointer" }} onClick={()=>ToggleBlock(user._id)}><ImBlocked style={{ color: user.isBlocked ? "red" : "black" }} /></td>
+                            <td style={{ ...styles.td, cursor: "pointer" }} onClick={() => ToggleBlock(user._id)}>
+                                <ImBlocked style={{ color: user.isBlocked ? "red" : "black" }} />
+                            </td>
                             <td style={styles.td}>{user.name}</td>
                             <td style={styles.td}>{user.email}</td>
                             <td style={styles.td}>{user.role}</td>

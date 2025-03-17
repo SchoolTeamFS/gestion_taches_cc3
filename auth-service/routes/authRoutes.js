@@ -115,9 +115,12 @@ router.patch("/:id/ToggleBlock", verifyToken, isAdmin, async (req, res) => {
   }
 });
 
-router.get("/search", isAdmin, async (req, res) => {
+router.get("/:keyword/search", verifyToken, isAdmin, async (req, res) => {
   try {
-    const { keyword } = req.query;
+    const { keyword } = req.params; 
+    if (!keyword) {
+      return res.status(400).json({ message: "Keyword is required for search" });
+    }
     const users = await User.find({
       $or: [
         { name: { $regex: keyword, $options: "i" } },
@@ -125,10 +128,12 @@ router.get("/search", isAdmin, async (req, res) => {
         { role: { $regex: keyword, $options: "i" } },
       ],
     });
+
     res.json(users);
   } catch (error) {
-    res.status(500).json({ message: "Error searching users", error });
+    res.status(500).json({ message: "Error searching users", error: error.message });
   }
 });
+
 
 module.exports = router;
