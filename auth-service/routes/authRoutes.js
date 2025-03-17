@@ -49,10 +49,10 @@ router.post("/login", async (req, res) => {
     res.json({ token });
   } catch (err) {
     res.status(500).json({ msg: "Server error", detail: err.message });
-  }
+  } 
 });
 
-router.get('/profile', verifyToken, isAdmin, async (req, res) => {
+router.get('/profile', verifyToken, async (req, res) => {
   res.json(req.user); 
 });
 
@@ -102,27 +102,14 @@ router.delete("/delete/:id", verifyToken, isAdmin, async (req, res) => {
   }
 });
 
-router.patch("/users/:id/block", verifyToken, isAdmin, async (req, res) => {
+router.patch("/:id/ToggleBlock", verifyToken, isAdmin, async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
     if (!user) return res.status(404).json({ msg: "User not found" });
 
-    user.isBlocked = true;
+    user.isBlocked = !user.isBlocked;
     await user.save();
     res.json({ msg: "User blocked successfully" });
-  } catch (err) {
-    res.status(500).json({ msg: "Server error", detail: err.message });
-  }
-});
-
-router.patch("/users/:id/unblock", verifyToken, isAdmin, async (req, res) => {
-  try {
-    const user = await User.findById(req.params.id);
-    if (!user) return res.status(404).json({ msg: "User not found" });
-
-    user.isBlocked = false;
-    await user.save();
-    res.json({ msg: "User unblocked successfully" });
   } catch (err) {
     res.status(500).json({ msg: "Server error", detail: err.message });
   }

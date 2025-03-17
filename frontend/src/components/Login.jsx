@@ -10,8 +10,12 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await login(email, password);
-    navigate("/");
+    try{
+      await login(email, password);
+      navigate("/");
+    }catch(e){
+      console.log(e)
+    }
   };
 
   const styles = {

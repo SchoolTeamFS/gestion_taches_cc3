@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import authApi from '../api/authApi';
 import { useNavigate } from "react-router-dom";
+import { ImBlocked } from "react-icons/im";
 
 const ManageUser = () => {
     const [users, setUsers] = useState([]);
@@ -40,6 +41,17 @@ const ManageUser = () => {
             setError("Error deleting user");
         }
     };
+    const ToggleBlock = async (id) => {
+        try {
+            const token = localStorage.getItem("token");
+            await authApi.patch(`/auth/${id}/ToggleBlock`, {}, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            fetchUsers();
+        } catch (error) {
+            setError("Error toggling block.");
+        }
+    };
 
     const styles = {
         container: {
@@ -55,17 +67,16 @@ const ManageUser = () => {
             width: "100%",
             borderCollapse: "collapse",
             marginTop: "20px",
+            textAlign: "center",
         },
         th: {
             backgroundColor: "#333",
             color: "white",
             padding: "12px",
-            textAlign: "left",
         },
         td: {
             border: "1px solid #ddd",
             padding: "10px",
-            textAlign: "left",
         },
         button: {
             padding: "8px 12px",
@@ -104,6 +115,7 @@ const ManageUser = () => {
             <table style={styles.table}>
                 <thead>
                     <tr>
+                        <th style={styles.th}>block</th>
                         <th style={styles.th}>Name</th>
                         <th style={styles.th}>Email</th>
                         <th style={styles.th}>Role</th>
@@ -113,6 +125,7 @@ const ManageUser = () => {
                 <tbody>
                     {users.map((user) => (
                         <tr key={user._id}>
+                            <td style={{ ...styles.td, cursor: "pointer" }} onClick={()=>ToggleBlock(user._id)}><ImBlocked style={{ color: user.isBlocked ? "red" : "black" }} /></td>
                             <td style={styles.td}>{user.name}</td>
                             <td style={styles.td}>{user.email}</td>
                             <td style={styles.td}>{user.role}</td>

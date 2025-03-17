@@ -6,11 +6,12 @@ import Login from "./components/Login";
 import PrivateRoute from "./components/PrivateRoute";
 import Home from "./components/home";
 import Register from "./components/Register";
-import Chat from "./components/Caht";
+import Chat from "./components/Chat";
 import Projet from "./components/Projet";
 import Taches from "./components/Taches";
 import MangeUser from "./components/MangeUser";
 import UpdateUser from "./components/UpdateUser";
+import DashBoard from "./components/Dashboard";
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
         <div style={{ padding: "20px" }}>
           <Routes>
             <Route path="/" element={<Home/>} />
+            <Route path="/dashBoard" element={<DashBoard/>} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/manage_users" element={<PrivateRoute><MangeUser /></PrivateRoute>} />
