@@ -30,6 +30,18 @@ router.get("/categories", async (req, res) => {
     res.status(500).json({ message: "Erreur serveur", error: error.message })
   }
 })
+router.get("/all", async (req, res) => {
+    try {
+      const projets = await Project.find()
+      if (projets.length === 0) {
+        return res.status(404).json({ message: "projet introuvable" })
+      }
+      res.status(200).json(projets)
+    } catch (error) {
+      res.status(500).json({ message: "Erreur serveur", error: error.message })
+    }
+  })
+  
 
 router.post("/add", async (req, res) => {
   try {
