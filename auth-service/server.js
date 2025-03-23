@@ -18,6 +18,6 @@ mongoose.connect(`${MONGODB_URL}/${DBNAME}`)
 const db=mongoose.connection;
 
 app.use("/auth", authRoutes);
-
+app.get("/",(req,res)=>res.send("auth service"))
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Auth-Service running on port ${PORT}`));
