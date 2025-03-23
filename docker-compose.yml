@@ -1,0 +1,54 @@
+version: '3'
+services:
+  # Service d'authentification
+  auth-service:
+    build:
+      context: ./auth-service  # Répertoire du service d'authentification
+    ports:
+      - "5000:5000"  # Expose le port 5000 pour accéder au service d'authentification
+    environment:
+      - MONGODB_URL=mongodb://mongo:27017/gestion_taches_cc3  # Connexion à MongoDB (nom du service mongo dans Compose)
+      - JWT_SECRET=9a92ad437a5c3e8b63889d7423ba7271f8c1445c3f44595eab7908b303c2a6410335bec9940e6a997e71b157bdc23a46ccad04f08d1b27316dd829b6323a093d  # Secret JWT
+      - PORT=5000
+    depends_on:
+      - mongo  # Attendre que MongoDB soit prêt avant de démarrer ce service
+
+  # Service projet
+  projet-service:
+    build:
+      context: ./projet-service  # Répertoire du service projet
+    ports:
+      - "5001:5001"  # Expose le port 5001 pour accéder au service projet
+    environment:
+      - MONGODB_URL=mongodb://mongo:27017/gestion_taches_cc3  # Connexion à MongoDB
+      - JWT_SECRET=9a92ad437a5c3e8b63889d7423ba7271f8c1445c3f44595eab7908b303c2a6410335bec9940e6a997e71b157bdc23a46ccad04f08d1b27316dd829b6323a093d  # Secret JWT
+      - PORT=5001
+    depends_on:
+      - mongo  # Attendre que MongoDB soit prêt avant de démarrer ce service
+
+  # # Service tache
+  # tache-service:
+  #   build:
+  #     context: ./tache-service  # Répertoire du service tâche
+  #   ports:
+  #     - "5002:5002"  # Expose le port 5002 pour accéder au service tâche
+  #   environment:
+  #     - MONGODB_URL=mongodb://mongo:27017/gestion_taches_cc3  # Connexion à MongoDB
+  #     - JWT_SECRET=9a92ad437a5c3e8b63889d7423ba7271f8c1445c3f44595eab7908b303c2a6410335bec9940e6a997e71b157bdc23a46ccad04f08d1b27316dd829b6323a093d  # Secret JWT
+  #     - PORT=5002
+  #   depends_on:
+  #     - mongo  # Attendre que MongoDB soit prêt avant de démarrer ce service
+
+  # Service MongoDB
+  mongo:
+    image: mongo:latest  # Utiliser l'image officielle de MongoDB
+    ports:
+      - "27017:27017"  # Expose le port 27017 pour accéder à MongoDB depuis l'extérieur
+    environment:
+      - MONGO_INITDB_DATABASE=gestion_taches_cc3  # Nom de la base de données
+    volumes:
+      - mongo_data:/data/db  # Persistance des données MongoDB
+
+# Définir un volume pour persister les données de MongoDB
+volumes:
+  mongo_data:
