@@ -59,7 +59,7 @@ const ManageUser = () => {
             await authApi.patch(`/auth/${id}/ToggleBlock`, {}, {
                 headers: { Authorization: `Bearer ${token}` }
             });
-            fetchUsers();  // Refresh the users list after toggling block status
+            fetchUsers(); 
         } catch (error) {
             setError("Error toggling block.");
         }

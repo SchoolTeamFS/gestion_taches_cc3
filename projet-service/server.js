@@ -22,6 +22,6 @@ mongoose.connection.on("error",err=>console.error("🔴 Perte de connexion Mongo
 app.use("/projet",verifytoken,projetroute)
 
 app.get("/",(req,res)=>res.send("projet service"))
-
+ 
 const port=PORT||5001
 app.listen(port,()=>console.log(`Serveur en écoute sur le port ${port}`))

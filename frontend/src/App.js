@@ -12,6 +12,11 @@ import Taches from "./components/Taches";
 import MangeUser from "./components/MangeUser";
 import UpdateUser from "./components/UpdateUser";
 import DashBoard from "./components/Dashboard";
+import AllProjects from "./components/AllProjects";
+import AddProject from "./components/AddProject";
+import AllCategories from "./components/AllCategories";
+import AddCategory from "./components/AddCategory";
+import AllUsers from "./components/AllUsers";
 
 function App() {
   return (
@@ -22,6 +27,11 @@ function App() {
           <Routes>
             <Route path="/" element={<Home/>} />
             <Route path="/dashBoard" element={<DashBoard/>} />
+            <Route path="/projets" element={<AllProjects/>} />
+            <Route path="/AddProject" element={<AddProject/>} />
+            <Route path="/categorie" element={<AllCategories/>} />
+            <Route path="/AddCategory" element={<AddCategory/>} />
+            <Route path="/enroll/:project_id" element={<AllUsers/>} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/manage_users" element={<PrivateRoute><MangeUser /></PrivateRoute>} />
