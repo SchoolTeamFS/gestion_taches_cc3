@@ -1,6 +1,7 @@
 import React from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
+import { TaskProvider } from "./context/TaskContext";
 import Header from "./components/Header";
 import Login from "./components/Login";
 import PrivateRoute from "./components/PrivateRoute";
@@ -17,10 +18,13 @@ import AddProject from "./components/AddProject";
 import AllCategories from "./components/AllCategories";
 import AddCategory from "./components/AddCategory";
 import AllUsers from "./components/AllUsers";
+import KanbanBoard from "./components/KanbanBoard";
+import TaskForm from "./components/TaskForm";
 
 function App() {
   return (
     <AuthProvider>
+        <TaskProvider>
       <Router>
         <Header />
         <div style={{ padding: "20px" }}>
@@ -39,9 +43,12 @@ function App() {
             <Route path="/chat" element={<PrivateRoute><Chat /></PrivateRoute>} />
             <Route path="/projets" element={<PrivateRoute><Projet /></PrivateRoute>} />
             <Route path="/taches" element={<PrivateRoute><Taches /></PrivateRoute>} />
+            <Route path="/taches/add" element={<PrivateRoute><TaskForm /></PrivateRoute>} />
+            <Route path="/taches/kanban" element={<PrivateRoute><KanbanBoard /></PrivateRoute>} />
           </Routes>
         </div>
       </Router>
+      </TaskProvider>
     </AuthProvider>
   );
 }
