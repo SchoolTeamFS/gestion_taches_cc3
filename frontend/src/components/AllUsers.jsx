@@ -7,8 +7,8 @@ const AllUsers = () => {
     const { project_id } = useParams();
     const [users, setUsers] = useState([]);
     const [projects, setProjects] = useState([]);
-    const [error, setError] = useState('');
     const [message, setMessage] = useState('');
+    const [error, setError] = useState('');
     const [search, setSearch] = useState(''); 
 
     const projet = projects.find(pro => pro._id === project_id);
@@ -16,7 +16,7 @@ const AllUsers = () => {
     useEffect(() => {
         fetchUsers();
         fetchProjects();
-    }, [message]); 
+    }, []); 
 
     const fetchUsers = async (keyword = '') => {
         try {
@@ -58,9 +58,15 @@ const AllUsers = () => {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setMessage(res.data.message);
+            setTimeout(() => {
+                setMessage("");
+            }, 3000); 
             fetchUsers(); 
         } catch (error) {
             setError("Error enrolling user");
+            setTimeout(() => {
+                setError("");
+            }, 3000);
             console.error("Error enrolling user:", error.response?.data || error.message);
         }
     };
@@ -72,9 +78,15 @@ const AllUsers = () => {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setMessage(res.data.message);
+            setTimeout(() => {
+                setMessage("");
+            }, 3000); 
             fetchUsers(); 
         } catch (error) {
             setError("Error removing user");
+            setTimeout(() => {
+                setError("");
+            }, 3000);
             console.error("Error removing user:", error.response?.data || error.message);
         }
     };

@@ -36,9 +36,14 @@ const AddProject = () => {
                 headers: { Authorization: `Bearer ${token}` },
             });
             setMessage("Project added successfully!");
+            setError("");
             navigate("/projets");
         } catch (error) {
-            setMessage("Error adding project");
+            setError("Error adding project");
+            setMessage(""); 
+            setTimeout(() => {
+                setError("");
+            }, 3000);
         }
     };
 

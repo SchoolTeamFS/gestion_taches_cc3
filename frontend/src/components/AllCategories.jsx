@@ -7,6 +7,7 @@ import { FaRegTrashAlt } from "react-icons/fa";
 const AllCategories = () => {
     const [categories, setCategories] = useState([]);
     const [error, setError] = useState("");
+    const [message, setMessage] = useState("");
     const [isEditing, setIsEditing] = useState(null);
     const [updatedCategory, setUpdatedCategory] = useState({});
 
@@ -21,8 +22,14 @@ const AllCategories = () => {
                 headers: { Authorization: `Bearer ${token}` },
             });
             setCategories(response.data);
+            setMessage(response.data.message);
+            setError(""); 
         } catch (error) {
             setError("Error fetching categories");
+            setMessage(""); 
+            setTimeout(() => {
+                setError("");
+            }, 3000);
         }
     };
 
@@ -38,22 +45,34 @@ const AllCategories = () => {
                 )
             );
             setIsEditing(null); 
+            setMessage(response.data.message);
+            setError(""); 
         } catch (error) {
             setError("Error updating category");
+            setMessage(""); 
+            setTimeout(() => {
+                setError("");
+            }, 3000);
         }
     };
 
     const handleDelete = async (categoryId) => {
         try {
             const token = localStorage.getItem("token");
-            await proApi.delete(`/deleteCategory/${categoryId}`, {
+            const res = await proApi.delete(`/deleteCategory/${categoryId}`, {
                 headers: { Authorization: `Bearer ${token}` },
             });
             setCategories((prevCategories) =>
                 prevCategories.filter((category) => category._id !== categoryId)
             );
+            setMessage(res.data.message);
+            setError(""); 
         } catch (error) {
             setError("Error deleting category");
+            setMessage(""); 
+            setTimeout(() => {
+                setError("");
+            }, 3000);
         }
     };
 
@@ -131,6 +150,11 @@ const AllCategories = () => {
             fontSize: "14px",
             marginBottom: "10px",
         },
+        message: {
+            color: "green",
+            fontSize: "14px",
+            marginBottom: "10px",
+        },
     };
 
     return (
@@ -140,6 +164,7 @@ const AllCategories = () => {
             </NavLink>
             <h2>All Categories</h2>
             {error && <p style={styles.error}>{error}</p>}
+            {message && <p style={styles.message}>{message}</p>}
             {categories.length === 0 ? (
                 <p>No categories found</p>
             ) : (

@@ -31,8 +31,7 @@ const AllProjects = () => {
             });
             setUsers(response.data);
         } catch (error) {
-            setError("Error fetching users");
-            console.log(error)
+            console.log("Error fetching users");
         }
     };
 
@@ -44,7 +43,7 @@ const AllProjects = () => {
             });
             setProjects(response.data);
         } catch (error) {
-            setError("Error fetching projects");
+            console.log("Error fetching projects");
         }
     };
 
@@ -60,6 +59,10 @@ const AllProjects = () => {
                 )
             );
             setIsEditing(null);
+            setMessage("Project updated successfuly");
+            setTimeout(() => {
+                setMessage("");
+            }, 3000); 
         } catch (error) {
             setError("Error updating project");
         }
@@ -68,14 +71,22 @@ const AllProjects = () => {
     const handleDelete = async (projectId) => {
         try {
             const token = localStorage.getItem("token");
-            await proApi.delete(`/delete/${projectId}`, {
+            const res = await proApi.delete(`/delete/${projectId}`, {
                 headers: { Authorization: `Bearer ${token}` },
             });
             setProjects((prevProjects) =>
                 prevProjects.filter((project) => project._id !== projectId)
             );
+            setMessage(res.data.message);
+            setTimeout(() => {
+                setMessage("");
+            }, 3000); 
         } catch (error) {
             setError("Error deleting project");
+            setMessage(""); 
+            setTimeout(() => {
+                setError("");
+            }, 3000);
         }
     };
 
@@ -86,9 +97,17 @@ const AllProjects = () => {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setMessage(res.data.message);
+            setError(""); 
+            setTimeout(() => {
+                setMessage("");
+            }, 3000); 
             fetchProjects(); 
         } catch (error) {
             setError("Error removing user");
+            setMessage(""); 
+            setTimeout(() => {
+                setError(""); 
+            }, 3000);
             console.error("Error removing user:", error.response?.data || error.message);
         }
     };

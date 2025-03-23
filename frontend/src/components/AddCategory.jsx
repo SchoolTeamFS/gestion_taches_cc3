@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 const AddCategory = () => {
     const [categoryName, setCategoryName] = useState("");
     const [message, setMessage] = useState("");
+    const [error, setError] = useState("");
     const navigate = useNavigate();
 
     const handleChange = (e) => {
@@ -19,9 +20,14 @@ const AddCategory = () => {
                 headers: { Authorization: `Bearer ${token}` },
             });
             setMessage("Category added successfully!");
+            setError(""); 
             navigate("/categorie");
         } catch (error) {
-            setMessage("Error adding category");
+            setError("Error adding category");
+            setMessage(""); 
+            setTimeout(() => {
+                setError("");
+            }, 3000);
         }
     };
 
@@ -76,6 +82,7 @@ const AddCategory = () => {
     return (
         <div style={styles.container}>
             <h2>Add Category</h2>
+            {error && <p style={styles.error}>{error}</p>}
             {message && <p style={styles.message}>{message}</p>}
             <form onSubmit={handleSubmit} style={styles.form}>
                 <input

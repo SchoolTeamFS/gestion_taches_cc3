@@ -33,6 +33,56 @@ router.post("/register", async (req, res) => {
   }
 });
 
+router.post("/add", verifyToken, isAdmin, async (req, res) => {
+  const { name, email, password, role } = req.body;
+  if (!name || !email || !password || !role) {
+    return res.status(400).json({ msg: "All fields are required." });
+  }
+  try {
+    let existingUser = await User.findOne({ name });
+    if (existingUser) return res.status(400).json({ msg: "Username already exists." });
+
+    let existingEmail = await User.findOne({ email });
+    if (existingEmail) return res.status(400).json({ msg: "Email already exists." });
+
+    let user = new User({ name, email, password, role });
+
+    const salt = await bcrypt.genSalt(10);
+    user.password = await bcrypt.hash(password, salt);
+
+    await user.save();
+    res.status(201).json({ msg: "User registered successfully" });
+  } catch (err) {
+    res.status(500).json({ msg: "Server error", detail: err.message });
+  }
+});
+
+router.post("/register", async (req, res) => {
+  const { name, email, password } = req.body;
+
+  if (!name || !email || !password) {
+    return res.status(400).json({ msg: "All fields are required." });
+  }
+
+  try {
+    let existingUser = await User.findOne({ name });
+    if (existingUser) return res.status(400).json({ msg: "Username already exists." });
+
+    let existingEmail = await User.findOne({ email });
+    if (existingEmail) return res.status(400).json({ msg: "Email already exists." });
+
+    let user = new User({ name, email, password });
+
+    const salt = await bcrypt.genSalt(10);
+    user.password = await bcrypt.hash(password, salt);
+
+    await user.save();
+    res.status(201).json({ msg: "User registered successfully" });
+  } catch (err) {
+    res.status(500).json({ msg: "Server error", detail: err.message });
+  }
+});
+
 router.post("/login", async (req, res) => {
   const { email, password } = req.body;
 
@@ -91,16 +141,22 @@ router.put("/update/:id", verifyToken, isAdmin, async (req, res) => {
 
 router.delete("/delete/:id", verifyToken, isAdmin, async (req, res) => {
   try {
+    if (req.params.id === req.user._id.toString()) {
+      return res.status(400).json({ message: "An admin cannot delete their own account" });
+    }
+
     const result = await User.findOneAndDelete({ _id: req.params.id });
 
-  if (result.deletedCount === 0) {
-    return res.status(404).json({ message: "User not found" });
-  }
-  res.json({ message: "User deleted successfully"});
+    if (!result) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.json({ message: "User deleted successfully" });
   } catch (err) {
     res.status(500).json({ msg: "Server error", detail: err.message });
   }
 });
+
 
 router.patch("/:id/ToggleBlock", verifyToken, isAdmin, async (req, res) => {
   try {
@@ -134,6 +190,5 @@ router.get("/:keyword/search", verifyToken, isAdmin, async (req, res) => {
     res.status(500).json({ message: "Error searching users", error: error.message });
   }
 });
-
 
 module.exports = router;

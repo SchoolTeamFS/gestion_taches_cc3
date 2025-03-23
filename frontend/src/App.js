@@ -20,6 +20,7 @@ import AddCategory from "./components/AddCategory";
 import AllUsers from "./components/AllUsers";
 import KanbanBoard from "./components/KanbanBoard";
 import TaskForm from "./components/TaskForm";
+import AddUser from "./components/AddUser";
 
 function App() {
   return (
@@ -33,6 +34,7 @@ function App() {
             <Route path="/dashBoard" element={<DashBoard/>} />
             <Route path="/projets" element={<AllProjects/>} />
             <Route path="/AddProject" element={<AddProject/>} />
+            <Route path="/AddUser" element={<AddUser/>} />
             <Route path="/categorie" element={<AllCategories/>} />
             <Route path="/AddCategory" element={<AddCategory/>} />
             <Route path="/enroll/:project_id" element={<AllUsers/>} />
