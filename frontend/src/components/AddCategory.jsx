@@ -28,6 +28,7 @@ const AddCategory = () => {
             setTimeout(() => {
                 setError("");
             }, 3000);
+            navigate("/categorie");
         }
     };
 
@@ -106,5 +107,4 @@ const AddCategory = () => {
         </div>
     );
 };
-
 export default AddCategory;

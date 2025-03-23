@@ -53,7 +53,6 @@ const AllProjects = () => {
             console.error("Error fetching projects:", error.response?.data || error.message);
         }
     };
-    
 
     const handleUpdate = async (projectId) => {
         try {
@@ -95,6 +94,7 @@ const AllProjects = () => {
             setTimeout(() => {
                 setError("");
             }, 3000);
+        } 
         }
     };
 
@@ -299,6 +299,5 @@ const AllProjects = () => {
             </ul>
         </div>
     );
-};
 
 export default AllProjects;
