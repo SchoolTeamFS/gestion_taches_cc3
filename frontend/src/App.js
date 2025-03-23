@@ -30,7 +30,6 @@ import AuthContext from "./context/AuthContext";
 
 
 function App() {
-//const userId = '67dc45e52ce2b7b80b1b89a2'
 
   return (
     
