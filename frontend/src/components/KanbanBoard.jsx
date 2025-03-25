@@ -2,11 +2,12 @@ import React, { useEffect } from "react";
 import { useTaskContext } from "../context/TaskContext";
 
 const KanbanBoard = () => {
-  const { tasks, fetchAllTasks, loading, error } = useTaskContext();
+  const { tasks, fetchTasks, loading, error } = useTaskContext();
 
   useEffect(() => {
-    fetchAllTasks(); 
+    fetchTasks(); 
   }, []);
+
   if (loading) {
     return (
       <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}>
@@ -15,7 +16,7 @@ const KanbanBoard = () => {
     );
   }
 
- 
+
   if (error) {
     return (
       <div style={{ color: "red", textAlign: "center", marginTop: "20px" }}>
@@ -24,7 +25,7 @@ const KanbanBoard = () => {
     );
   }
 
- 
+  
   const tasksByStatus = {
     "À FAIRE": tasks.filter((task) => task.statut === "À FAIRE"),
     "EN COURS": tasks.filter((task) => task.statut === "EN COURS"),

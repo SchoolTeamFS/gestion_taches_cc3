@@ -1,14 +1,5 @@
 import React, { createContext, useState, useContext } from "react";
-import {
-  fetchTasks,
-  createTask,
-  updateTask,
-  deleteTask,
-  assignTask,
-  updateTaskStatus,
-  fetchComments,
-  addComment,
-} from '../api/taskApi'; 
+import axios from "axios";
 
 
 const TaskContext = createContext();
@@ -18,19 +9,21 @@ export const useTaskContext = () => {
   return useContext(TaskContext);
 };
 
+
 export const TaskProvider = ({ children }) => {
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [comments, setComments] = useState([]);
 
-
-  const fetchAllTasks = async () => {
+  // Récupérer toutes les tâches
+  const fetchTasks = async () => {
     setLoading(true);
     try {
       const token = localStorage.getItem("authToken");
-      const fetchedTasks = await fetchTasks(token);
-      setTasks(fetchedTasks);
+      const response = await axios.get("http://localhost:5002/tache", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setTasks(response.data);
     } catch (err) {
       setError("Failed to fetch tasks");
     } finally {
@@ -38,111 +31,26 @@ export const TaskProvider = ({ children }) => {
     }
   };
 
-  
-  const addNewTask = async (newTask) => {
+  // Ajouter une nouvelle tâche
+  const addTask = async (newTask) => {
     try {
       const token = localStorage.getItem("authToken");
-      const createdTask = await createTask(newTask, token);
-      setTasks((prevTasks) => [...prevTasks, createdTask]);
+      const response = await axios.post(
+        "http://localhost:5002/tache",
+        newTask,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      setTasks((prevTasks) => [...prevTasks, response.data.task]); 
     } catch (err) {
       setError("Failed to create task");
     }
   };
 
-
-  const modifyTask = async (id, updatedTask) => {
-    try {
-      const token = localStorage.getItem("authToken");
-      const updatedTaskData = await updateTask(id, updatedTask, token);
-      setTasks((prevTasks) =>
-        prevTasks.map((task) =>
-          task._id === id ? { ...task, ...updatedTaskData } : task
-        )
-      );
-    } catch (err) {
-      setError("Failed to update task");
-    }
-  };
-
-
-  const removeTask = async (id) => {
-    try {
-      const token = localStorage.getItem("authToken");
-      await deleteTask(id, token);
-      setTasks((prevTasks) => prevTasks.filter((task) => task._id !== id));
-    } catch (err) {
-      setError("Failed to delete task");
-    }
-  };
-
-  
-  const assignTaskToUser = async (id, userId) => {
-    try {
-      const token = localStorage.getItem("authToken");
-      const assignedTask = await assignTask(id, userId, token);
-      setTasks((prevTasks) =>
-        prevTasks.map((task) =>
-          task._id === id ? { ...task, assignéÀ: userId } : task
-        )
-      );
-    } catch (err) {
-      setError("Failed to assign task");
-    }
-  };
-
- 
-  const updateTaskState = async (id, status) => {
-    try {
-      const token = localStorage.getItem("authToken");
-      const updatedTask = await updateTaskStatus(id, status, token);
-      setTasks((prevTasks) =>
-        prevTasks.map((task) =>
-          task._id === id ? { ...task, statut: status } : task
-        )
-      );
-    } catch (err) {
-      setError("Failed to update task status");
-    }
-  };
-
- 
-  const fetchTaskComments = async (taskId) => {
-    try {
-      const token = localStorage.getItem("authToken");
-      const fetchedComments = await fetchComments(taskId, token);
-      setComments(fetchedComments);
-    } catch (err) {
-      setError("Failed to fetch comments");
-    }
-  };
-
-
-  const addCommentToTask = async (taskId, comment) => {
-    try {
-      const token = localStorage.getItem("authToken");
-      const newComment = await addComment(taskId, comment, token);
-      setComments((prevComments) => [...prevComments, newComment]);
-    } catch (err) {
-      setError("Failed to add comment");
-    }
-  };
-
   return (
     <TaskContext.Provider
-      value={{
-        tasks,
-        loading,
-        error,
-        comments,
-        fetchAllTasks,
-        addNewTask,
-        modifyTask,
-        removeTask,
-        assignTaskToUser,
-        updateTaskState,
-        fetchTaskComments,
-        addCommentToTask,
-      }}
+      value={{ tasks, loading, error, fetchTasks, addTask }}
     >
       {children}
     </TaskContext.Provider>
