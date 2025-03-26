@@ -53,6 +53,7 @@ const AllProjects = () => {
             console.error("Error fetching projects:", error.response?.data || error.message);
         }
     };
+    
 
     const handleUpdate = async (projectId) => {
         try {
