@@ -32,10 +32,10 @@ function App() {
           <Routes>
             <Route path="/" element={<Home/>} />
             <Route path="/dashBoard" element={<DashBoard/>} />
-            <Route path="/projets" element={<AllProjects/>} />
+            <Route path="/projets" element={<PrivateRoute><AllProjects/></PrivateRoute>} />
             <Route path="/AddProject" element={<AddProject/>} />
             <Route path="/AddUser" element={<AddUser/>} />
-            <Route path="/categorie" element={<AllCategories/>} />
+            <Route path="/categorie" element={<PrivateRoute><AllCategories/></PrivateRoute>} />
             <Route path="/AddCategory" element={<AddCategory/>} />
             <Route path="/enroll/:project_id" element={<AllUsers/>} />
             <Route path="/login" element={<Login />} />

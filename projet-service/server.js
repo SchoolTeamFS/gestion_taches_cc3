@@ -3,7 +3,6 @@ const mongoose=require("mongoose")
 const dotenv=require("dotenv")
 const cors=require("cors")
 const projetroute=require("./routes/projet")
-const verifytoken=require("./middleware/verifyToken")
 
 dotenv.config()
 const app=express()
@@ -19,7 +18,7 @@ mongoose.connect(`${MONGODB_URL}/${DATABASE}`)
 
 mongoose.connection.on("error",err=>console.error("🔴 Perte de connexion MongoDB:",err))
 
-app.use("/projet",verifytoken,projetroute)
+app.use("/projet",projetroute)
 
 app.get("/",(req,res)=>res.send("projet service"))
  

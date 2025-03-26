@@ -2,10 +2,10 @@ const express = require("express")
 const axios = require('axios')
 const Project = require("../models/projetModel")
 const Category = require('../models/categoryModel')
-const isAdmin = require('../middleware/isAdmin')
+const verifytoken=require("../middleware/verifyToken")
 const router = express.Router()
 
-router.post("/category/add", async (req, res) => {
+router.post("/category/add", verifytoken, async (req, res) => {
   try {
     const { nom } = req.body
     const existingCategory = await Category.findOne({ nom })
@@ -21,7 +21,7 @@ router.post("/category/add", async (req, res) => {
   }
 })
 
-router.get("/categories", async (req, res) => {
+router.get("/categories", verifytoken, async (req, res) => {
   try {
     const categories = await Category.find()
     if (categories.length === 0) {
@@ -32,7 +32,7 @@ router.get("/categories", async (req, res) => {
     res.status(500).json({ message: "Erreur serveur", error: error.message })
   }
 })
-router.put("/updateCategory/:id", async (req, res) => {
+router.put("/updateCategory/:id", verifytoken, async (req, res) => {
   try {
     const categorie = await Category.findOneAndUpdate(
       { _id: req.params.id },
@@ -46,33 +46,63 @@ router.put("/updateCategory/:id", async (req, res) => {
     res.status(400).json({ message: error.message })
   }
 })
-router.delete("/deleteCategory/:id", async (req, res) => {
+router.delete("/deleteCategory/:id", verifytoken, async (req, res) => {
   try {
-    const categorie = await Category.findByIdAndDelete(req.params.id)
-    if (!categorie) return res.status(404).json({ message: "Categorie non trouvé" })
-    res.status(200).json({ message: "Categorie supprimé avec succès" })
-  } catch (error) {
-    res.status(500).json({ message: error.message })
-  }
-})
-router.get("/all", async (req, res) => {
-    try {
-      const projets = await Project.find()
-      if (projets.length === 0) {
-        return res.status(404).json({ message: "projet introuvable" })
-      }
-      res.status(200).json(projets)
-    } catch (error) {
-      res.status(500).json({ message: "Erreur serveur", error: error.message })
-    }
-  })
-  
+    const categoryId = req.params.id;
+    const category = await Category.findById(categoryId);
+    const associatedProjects = await Project.find({ categorie: category.nom });
 
-router.post("/add", async (req, res) => {
+    if (associatedProjects.length > 0) {
+      return res.status(400).json({
+        message: "Cannot delete category because it has associated projects.",
+      });
+    }
+    const categorie = await Category.findByIdAndDelete(categoryId);
+
+    if (!categorie) {
+      return res.status(404).json({ message: "Category not found" });
+    }
+
+    res.status(200).json({ message: "Category deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+router.get("/all", verifytoken, async (req, res) => {
   try {
-    const { nom, description, dateDebut, dateFin, statut, categorieNom } = req.body
-    const category = await Category.findOne({ nom: categorieNom })
-    if (!category) return res.status(404).json({ message: "Catégorie non trouvée" })
+      const user = req.user;
+
+      let projets;
+      if (user.role === "admin") {
+          projets = await Project.find();
+      } else {
+          projets = await Project.find({ membre: { $in: [user.id] } });
+      }
+
+      if (projets.length === 0) {
+          return res.status(404).json({ message: "Aucun projet trouvé" });
+      }
+
+      res.status(200).json(projets);
+  } catch (error) {
+      res.status(500).json({ message: "Erreur serveur", error: error.message });
+  }
+});
+
+
+router.post("/add", verifytoken, async (req, res) => {
+  console.log("User making request:", req.user);
+  const user = req.user
+  if (!req.user || !req.user.id) {
+    return res.status(401).json({ message: "Unauthorized. User ID missing." });
+  }
+
+  try {
+    const { nom, description, dateDebut, dateFin, statut, categorieNom } = req.body;
+
+    const category = await Category.findOne({ nom: categorieNom });
+    if (!category) return res.status(404).json({ message: "Catégorie non trouvée" });
 
     const newProject = new Project({
       nom,
@@ -80,17 +110,20 @@ router.post("/add", async (req, res) => {
       dateDebut,
       dateFin,
       statut,
-      categorie: category.nom
-    })
+      categorie: category.nom,
+      membre: [],
+    });
+    newProject.membre.push(user.id);
 
-    await newProject.save()
-    res.status(201).json(newProject)
+    await newProject.save();
+    res.status(201).json(newProject);
   } catch (error) {
-    res.status(400).json({ message: error.message })
+    res.status(400).json({ message: error.message });
   }
-})
+});
 
-router.get("/filter", async (req, res) => {
+
+router.get("/filter", verifytoken, async (req, res) => {
   try {
     const { nom, dateDebut, dateFin, statut } = req.query
     const filter = {}
@@ -123,7 +156,7 @@ router.get("/filter", async (req, res) => {
   }
 })
 
-router.put("/update/:id", async (req, res) => {
+router.put("/update/:id", verifytoken, async (req, res) => {
   try {
     const project = await Project.findOneAndUpdate(
       { _id: req.params.id },
@@ -139,7 +172,7 @@ router.put("/update/:id", async (req, res) => {
   }
 })
 
-router.delete("/delete/:id", async (req, res) => {
+router.delete("/delete/:id", verifytoken, async (req, res) => {
   try {
     const project = await Project.findByIdAndDelete(req.params.id)
     if (!project) return res.status(404).json({ message: "Projet non trouvé" })
@@ -149,7 +182,7 @@ router.delete("/delete/:id", async (req, res) => {
   }
 })
 
-router.post("/enroll/:user_id/:projet_id", isAdmin, async (req, res) => {
+router.post("/enroll/:user_id/:projet_id", verifytoken, async (req, res) => {
   try {
     const { user_id, projet_id } = req.params;
     console.log(`Attempting to enroll user ${user_id} in project ${projet_id}`);
@@ -183,7 +216,7 @@ router.post("/enroll/:user_id/:projet_id", isAdmin, async (req, res) => {
   }
 });
 
-  router.delete("/removeUser/:user_id/:projet_id", isAdmin, async (req, res) => {
+  router.delete("/removeUser/:user_id/:projet_id", verifytoken, async (req, res) => {
     try {
       const { user_id, projet_id } = req.params;
       const userResponse = await axios.get(`http://localhost:5000/auth/${user_id}`, {

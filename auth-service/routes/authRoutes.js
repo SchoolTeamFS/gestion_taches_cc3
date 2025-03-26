@@ -106,7 +106,7 @@ router.get('/profile', verifyToken, async (req, res) => {
   res.json(req.user); 
 });
 
-router.get("/all", verifyToken, isAdmin, async (req, res) => {
+router.get("/all", verifyToken, async (req, res) => {
   try {
     const users = await User.find();
     res.json(users);
@@ -114,7 +114,7 @@ router.get("/all", verifyToken, isAdmin, async (req, res) => {
     res.status(500).json({ msg: "Server error", detail: err.message });
   }
 });
-router.get("/:id", verifyToken, isAdmin, async (req, res) => {
+router.get("/:id", verifyToken, async (req, res) => {
   try {
     const user = await User.findOne({_id: req.params.id});
     if(!user) return res.status(404).json({msg: 'user not found'})

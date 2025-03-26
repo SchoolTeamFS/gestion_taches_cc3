@@ -68,7 +68,7 @@ const AllCategories = () => {
             setMessage(res.data.message);
             setError(""); 
         } catch (error) {
-            setError("Error deleting category");
+            setError("Cannot delete category because it has associated projects.");
             setMessage(""); 
             setTimeout(() => {
                 setError("");

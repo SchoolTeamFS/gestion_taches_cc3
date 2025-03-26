@@ -38,14 +38,22 @@ const AllProjects = () => {
     const fetchProjects = async () => {
         try {
             const token = localStorage.getItem("token");
+    
+            if (!token) {
+                console.error("No token found");
+                return;
+            }
+    
             const response = await proApi.get("/all", {
                 headers: { Authorization: `Bearer ${token}` },
             });
+    
             setProjects(response.data);
         } catch (error) {
-            console.log("Error fetching projects");
+            console.error("Error fetching projects:", error.response?.data || error.message);
         }
     };
+    
 
     const handleUpdate = async (projectId) => {
         try {
@@ -155,6 +163,9 @@ const AllProjects = () => {
             color: "#777",
             marginBottom: "15px",
         },
+        projectCategorie: {
+            marginBottom: "15px",
+        },
         projectActions: {
             display: "flex",
             alignItems: "center",
@@ -248,6 +259,7 @@ const AllProjects = () => {
                             <div>
                                 <span style={styles.projectTitle}>{project.nom}</span>
                                 <p style={styles.projectStatus}>{project.statut}</p>
+                                <p style={styles.projectCategorie}>Categorie: {project.categorie}</p>
                                 <p>Enrolled in courses:</p>
                                 <ul>
                                     {Array.isArray(project?.membre) && project.membre.length > 0 ? (
