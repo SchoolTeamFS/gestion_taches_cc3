@@ -41,10 +41,11 @@ const Header = () => {
       <ul style={styles.navLinks}>
       {user && user.role === "admin" ? (
         <li><Link to="/dashBoard" style={styles.link}>DashBoard</Link></li>
-        ): "" }
+        ): "" } 
         <li><Link to="/" style={styles.link}>Home</Link></li>
         <li><Link to="/chat" style={styles.link}>Chat</Link></li>
         <li><Link to="/projets" style={styles.link}>Projet</Link></li>
+        <li><Link to="/categorie" style={styles.link}>Categorie</Link></li>
         <li><Link to="/taches" style={styles.link}>Taches</Link></li>
         {user && user.role === "admin" ? (
         <li><Link to="/manage_users" style={styles.link}>Mange User</Link></li>
