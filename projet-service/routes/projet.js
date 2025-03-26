@@ -2,7 +2,8 @@ const express = require("express")
 const axios = require('axios')
 const Project = require("../models/projetModel")
 const Category = require('../models/categoryModel')
-const verifytoken=require("../middleware/verifyToken")
+const verifytoken=require("../middleware/verifyToken");
+const isAdmin = require("../middleware/isAdmin");
 const router = express.Router()
 
 router.post("/category/add", verifytoken, async (req, res) => {
@@ -216,31 +217,63 @@ router.post("/enroll/:user_id/:projet_id", verifytoken, async (req, res) => {
   }
 });
 
-  router.delete("/removeUser/:user_id/:projet_id", verifytoken, async (req, res) => {
-    try {
-      const { user_id, projet_id } = req.params;
-      const userResponse = await axios.get(`http://localhost:5000/auth/${user_id}`, {
-        headers: { Authorization: req.headers.authorization }
-      });
-      const project = await Project.findById(projet_id);
+router.delete("/removeUser/:user_id/:projet_id", verifytoken, async (req, res) => {
+  try {
+    const { user_id, projet_id } = req.params;
+    const userResponse = await axios.get(`http://localhost:5000/auth/${user_id}`, {
+      headers: { Authorization: req.headers.authorization }
+    });
+    const project = await Project.findById(projet_id);
 
-      if (!userResponse.data) {
-        return res.status(404).json({ message: "User not found" });
-      }
-      const result = await Project.updateOne(
-        { _id: projet_id }, 
-        { $pull: { membre: user_id } } 
-      );
-
-      if (result.modifiedCount === 0) {
-        return res.status(404).json({ message: "User or Project not found" });
-      }
-      res.json({ message: `User ${userResponse.data.name} removed from project ${project.nom}` });
-
-    } catch (error) {
-      console.error("Error removing user:", error);
-      res.status(500).json({ message: "Error updating user enrollments", error });
+    if (!userResponse.data) {
+      return res.status(404).json({ message: "User not found" });
     }
-  });
+    const result = await Project.updateOne(
+      { _id: projet_id }, 
+      { $pull: { membre: user_id } } 
+    );
+
+    if (result.modifiedCount === 0) {
+      return res.status(404).json({ message: "User or Project not found" });
+    }
+    res.json({ message: `User ${userResponse.data.name} removed from project ${project.nom}` });
+
+  } catch (error) {
+    console.error("Error removing user:", error);
+    res.status(500).json({ message: "Error updating user enrollments", error });
+  }
+});
+
+router.delete("/removeUser/:user_id", verifytoken, isAdmin, async (req, res) => {
+  try {
+    const { user_id } = req.params;
+
+    const userResponse = await axios.get(`http://localhost:5000/auth/${user_id}`, {
+      headers: { Authorization: req.headers.authorization }
+    });
+
+    if (!userResponse.data || !userResponse.data._id) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const user = userResponse.data; 
+
+    const result = await Project.updateMany(
+      { membre: user_id },
+      { $pull: { membre: user_id } }
+    );
+
+  
+
+    res.json({ message: `User ${user.name} removed from ${result.modifiedCount} projects` });
+
+  } catch (error) {
+    console.error("Error removing user from projects:", error);
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+});
+
+
+
 
 module.exports = router

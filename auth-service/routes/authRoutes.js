@@ -1,4 +1,5 @@
 const express = require("express");
+const axios = require('axios');
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/user");
@@ -141,18 +142,29 @@ router.put("/update/:id", verifyToken, isAdmin, async (req, res) => {
 
 router.delete("/delete/:id", verifyToken, isAdmin, async (req, res) => {
   try {
-    if (req.params.id === req.user._id.toString()) {
+    const userId = req.params.id;
+
+    if (userId === req.user.id.toString()) {
       return res.status(400).json({ message: "An admin cannot delete their own account" });
     }
-
-    const result = await User.findOneAndDelete({ _id: req.params.id });
-
-    if (!result) {
+    try {
+      const response = await axios.delete(`http://localhost:5001/projet/removeUser/${userId}`, {
+        headers: { Authorization: req.headers.authorization }
+      });
+      console.log("Axios response:", response.status); 
+    } catch (err) {
+      console.error("Axios error:", err.message);
+      return res.status(500).json({ message: "Error removing user from projects", error: err.message });
+    }
+    const deletedUser = await User.findOneAndDelete({ _id: userId });
+    if (!deletedUser) {
       return res.status(404).json({ message: "User not found" });
     }
 
-    res.json({ message: "User deleted successfully" });
+    res.json({ message: "User deleted successfully and removed from projects" });
+
   } catch (err) {
+    console.error("Error deleting user:", err);
     res.status(500).json({ msg: "Server error", detail: err.message });
   }
 });

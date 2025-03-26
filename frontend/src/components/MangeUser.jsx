@@ -46,7 +46,7 @@ const ManageUser = () => {
             const res = await authApi.delete(`/auth/delete/${id}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
-            setMessage("res.data.message");
+            setMessage(res.data.message);
             setTimeout(() => {
                 setMessage("");
             }, 3000); 
@@ -56,7 +56,6 @@ const ManageUser = () => {
                 setError(error.response.data.message);
             } else {
                 setError("Error deleting user");
-                console.log(error.response.data.message)
             }
     
             setTimeout(() => {
@@ -133,7 +132,7 @@ const ManageUser = () => {
             marginBottom: "10px",
         },
         message: {
-            color: "red",
+            color: "green",
             fontSize: "14px",
             marginBottom: "10px",
         },
