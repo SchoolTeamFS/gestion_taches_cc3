@@ -6,8 +6,14 @@ const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(localStorage.getItem("token") || "");
-  const [error, setError] = useState('');
-  
+  const [error, setError] = useState({});
+ 
+
+    useEffect(() => {
+        const storedUser = JSON.parse(localStorage.getItem("user"));
+        if (storedUser) setUser(storedUser);
+    }, []);
+    //--------------------
   useEffect(() => {
     if (token) {
       fetchUserProfile();
@@ -22,15 +28,15 @@ export const AuthProvider = ({ children }) => {
       });
       setUser(response.data);
     } catch (error) {
-      setError("Error fetching profile");
+      setError({mp:"Error fetching profile"});
     }
   };
 
   const register = async (name, email, password) => {
     try {
-      const response = await axios.post("http://localhost:5000/auth/register", { name, email, password });
+      await axios.post("http://localhost:5000/auth/register", { name, email, password });
     } catch (error) {
-      setError("Error registering user");
+      setError({pm:"Error registering user"});
     }
   };
 
@@ -41,7 +47,7 @@ export const AuthProvider = ({ children }) => {
       setToken(response.data.token);
       fetchUserProfile();
     } catch (error) {
-      setError("Invalid email or password ");
+      setError({lm:"Invalid email or password "});
     }
   };
 
