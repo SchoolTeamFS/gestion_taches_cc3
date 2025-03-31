@@ -61,7 +61,8 @@ const AllUsers = () => {
             setTimeout(() => {
                 setMessage("");
             }, 3000); 
-            fetchUsers(); 
+            fetchUsers();
+            fetchProjects();
         } catch (error) {
             setError("Error enrolling user");
             setTimeout(() => {
@@ -81,7 +82,8 @@ const AllUsers = () => {
             setTimeout(() => {
                 setMessage("");
             }, 3000); 
-            fetchUsers(); 
+            fetchUsers();
+            fetchProjects();
         } catch (error) {
             setError("Error removing user");
             setTimeout(() => {
