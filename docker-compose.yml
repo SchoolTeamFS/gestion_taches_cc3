@@ -4,11 +4,13 @@ services:
     container_name: mongo-1
     ports:
       - "27017:27017"  
-    environment:
+    # une variable d’environnement pour initialiser une base de données par défaut
+    environment: 
       - MONGO_INITDB_DATABASE=gestion_taches_cc3  
     volumes:
       - mongo_data:/data/db  
   auth-service:
+  # Indique que l’image sera construite à partir du répertoire ./auth-service en utilisant le Dockerfile
     build:
       context: ./auth-service  
       dockerfile: Dockerfile
