@@ -1,11 +1,13 @@
 import React, { useEffect } from "react";
 import { useTaskContext } from "../context/TaskContext";
+import { useNavigate } from "react-router-dom";
 
 const KanbanBoard = () => {
   const { tasks, fetchTasks, loading, error } = useTaskContext();
+  const navigate = useNavigate(); // For navigation
 
   useEffect(() => {
-    fetchTasks(); 
+    fetchTasks();
   }, []);
 
   if (loading) {
@@ -16,7 +18,6 @@ const KanbanBoard = () => {
     );
   }
 
-
   if (error) {
     return (
       <div style={{ color: "red", textAlign: "center", marginTop: "20px" }}>
@@ -25,7 +26,6 @@ const KanbanBoard = () => {
     );
   }
 
-  
   const tasksByStatus = {
     "À FAIRE": tasks.filter((task) => task.statut === "À FAIRE"),
     "EN COURS": tasks.filter((task) => task.statut === "EN COURS"),
@@ -41,9 +41,9 @@ const KanbanBoard = () => {
   };
 
   const statusColors = {
-    "À FAIRE": "#ff6f61", 
-    "EN COURS": "#ffa500", 
-    "TERMINÉ": "#4caf50", 
+    "À FAIRE": "#ff6f61",
+    "EN COURS": "#ffa500",
+    "TERMINÉ": "#4caf50",
   };
 
   const taskStyle = {
@@ -58,6 +58,25 @@ const KanbanBoard = () => {
   return (
     <div>
       <h2 style={{ textAlign: "center", margin: "20px 0", color: "#333" }}>Kanban Board</h2>
+
+      {/* Button to navigate to TaskTable */}
+      <div style={{ display: "flex", justifyContent: "center", margin: "20px 0" }}>
+        <button
+          onClick={() => navigate("/taches/manage")}
+          style={{
+            padding: "10px 15px",
+            backgroundColor: "#007bff",
+            color: "#fff",
+            border: "none",
+            borderRadius: "5px",
+            cursor: "pointer",
+            fontSize: "16px",
+          }}
+        >
+          View Task Table
+        </button>
+      </div>
+
       <div style={{ display: "flex", justifyContent: "space-between", marginTop: "20px" }}>
         {/* Column for "À FAIRE" tasks */}
         <div style={{ ...columnStyle, backgroundColor: statusColors["À FAIRE"] }}>

@@ -7,6 +7,7 @@ const taskSchema = new mongoose.Schema({
   deadline: { type: Date },
   statut: { type: String, enum: ['À FAIRE', 'EN COURS', 'TERMINÉ'], default: 'À FAIRE' },
   assignéÀ: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  projetId: { type: mongoose.Schema.Types.ObjectId, ref: 'Project' },
 });
 
 module.exports = mongoose.model('Task', taskSchema);

@@ -51,3 +51,38 @@ export const deleteTask = async (id) => {
     throw error;
   }
 };
+export const assignTaskToProject = async (taskId, projectId, token) => {
+  try {
+    const response = await axios.put(
+      `${API_URL}/${taskId}/assign-project`,
+      { projetId: projectId },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error assigning task to project:", error);
+    throw error;
+  }
+};
+
+export const updateTaskStatus = async (id, status, token) => {
+  try {
+    const response = await axios.put(
+      `${API_URL}/${id}/status`,
+      { statut: status },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error updating task status:", error);
+    throw error;
+  }
+};

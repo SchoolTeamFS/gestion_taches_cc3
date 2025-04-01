@@ -103,5 +103,19 @@ router.get('/:id/comments', async (req, res) => {
   }
 });
 
+// Assigner une tâche à un projet
+router.put('/:id/assign-project', async (req, res) => {
+  try {
+    const task = await Task.findById(req.params.id);
+    if (!task) {
+      return res.status(404).json({ message: 'Tâche non trouvée' });
+    }
+    task.projetId = req.body.projetId; 
+    await task.save();
+    res.status(200).json({ message: 'Tâche assignée au projet', task });
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+});
 
 module.exports = router;

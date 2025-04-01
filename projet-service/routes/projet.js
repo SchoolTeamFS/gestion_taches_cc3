@@ -273,6 +273,38 @@ router.delete("/removeUser/:user_id", verifytoken, isAdmin, async (req, res) => 
   }
 });
 
+router.get('/:id', async (req, res) => {
+  try {
+      const { id } = req.params;
+      const project = await Project.findById(id);
+
+      if (!project) {
+          return res.status(404).json({ message: "Projet introuvable" });
+      }
+
+      res.json(project);
+  } catch (error) {
+      res.status(500).json({ message: "Erreur serveur", error });
+  }
+});
+
+router.get('/user/:userId', verifytoken, async (req, res) => {
+  const userId = req.params.userId;
+
+  try {
+    const userProjects = await Project.find({ membre: userId });
+
+    if (userProjects.length > 0) {
+      res.json(userProjects);
+    } else {
+      res.status(404).send('Aucun projet trouvé pour cet utilisateur');
+    }
+  } catch (error) {
+    res.status(500).json({ message: "Erreur serveur", error: error.message });
+  }
+});
+
+
 
 
 

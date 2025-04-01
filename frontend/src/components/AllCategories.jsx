@@ -44,7 +44,7 @@ const AllCategories = () => {
                     category._id === categoryId ? response.data : category
                 )
             );
-            setIsEditing(null); 
+            setIsEditing(null);
             setMessage(response.data.message);
             setError(""); 
         } catch (error) {

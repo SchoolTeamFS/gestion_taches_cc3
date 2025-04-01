@@ -7,7 +7,12 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(localStorage.getItem("token") || "");
   const [error, setError] = useState({});
-  
+
+    useEffect(() => {
+        const storedUser = JSON.parse(localStorage.getItem("user"));
+        if (storedUser) setUser(storedUser);
+    }, []);
+    //--------------------
   useEffect(() => {
     if (token) {
       fetchUserProfile();
@@ -28,7 +33,7 @@ export const AuthProvider = ({ children }) => {
 
   const register = async (name, email, password) => {
     try {
-      const response = await axios.post("http://localhost:5000/auth/register", { name, email, password });
+      await axios.post("http://localhost:5000/auth/register", { name, email, password });
     } catch (error) {
       setError({pm:"Error registering user"});
     }

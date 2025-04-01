@@ -1,6 +1,6 @@
-import React from "react";
+import React, { useState,useEffect,useContext } from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import { AuthProvider } from "./context/AuthContext";
+import { AuthProvider } from "./context/AuthContext"; 
 import { TaskProvider } from "./context/TaskContext";
 import Header from "./components/Header";
 import Login from "./components/Login";
@@ -13,19 +13,27 @@ import Taches from "./components/Taches";
 import MangeUser from "./components/MangeUser";
 import UpdateUser from "./components/UpdateUser";
 import DashBoard from "./components/Dashboard";
+import KanbanBoard from "./components/KanbanBoard";
+import TaskForm from "./components/TaskForm";
+import TaskTable from "./components/TaskTable";
 import AllProjects from "./components/AllProjects";
 import AddProject from "./components/AddProject";
 import AllCategories from "./components/AllCategories";
 import AddCategory from "./components/AddCategory";
 import AllUsers from "./components/AllUsers";
-import KanbanBoard from "./components/KanbanBoard";
-import TaskForm from "./components/TaskForm";
 import AddUser from "./components/AddUser";
+import UserProjects from "./components/UserProjects";
+import { ChatProvider } from "./context/ChatContext";
+import AuthContext from "./context/AuthContext";
+
 
 function App() {
+
   return (
+    
     <AuthProvider>
         <TaskProvider>
+        <ChatProvider>
       <Router>
         <Header />
         <div style={{ padding: "20px" }}>
@@ -46,10 +54,17 @@ function App() {
             <Route path="/projets" element={<PrivateRoute><Projet /></PrivateRoute>} />
             <Route path="/taches" element={<PrivateRoute><Taches /></PrivateRoute>} />
             <Route path="/taches/add" element={<PrivateRoute><TaskForm /></PrivateRoute>} />
+            <Route path="/taches/manage" element={<PrivateRoute><TaskTable /></PrivateRoute>} />
             <Route path="/taches/kanban" element={<PrivateRoute><KanbanBoard /></PrivateRoute>} />
+            <Route path="/chat" element={<PrivateRoute><Chat /></PrivateRoute>} />
+            {/* <Route path="/user/projects" element={<UserProjects userId={user.id} />} /> */}
+            {/* <Route path="/user/projects" element={<UserProjects />} />
+
+            <Route path="/chat/:id" element={<Chat />} /> */}
           </Routes>
         </div>
       </Router>
+      </ChatProvider>
       </TaskProvider>
     </AuthProvider>
   );

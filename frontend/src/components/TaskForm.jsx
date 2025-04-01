@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useTaskContext } from "../context/TaskContext";
+import { useNavigate } from "react-router-dom";
 
 const TaskForm = () => {
   const { addTask, error, tasks } = useTaskContext();
+  const navigate = useNavigate(); 
   const [titre, setTitre] = useState("");
   const [description, setDescription] = useState("");
   const [priorité, setPriorité] = useState("MOYENNE");
@@ -10,31 +12,21 @@ const TaskForm = () => {
   const [statut, setStatut] = useState("À FAIRE");
   const [success, setSuccess] = useState("");
 
-  useEffect(() => {
-    if (tasks.length > 0) {
-      setSuccess("Task created successfully!");
-      const timer = setTimeout(() => setSuccess(""), 3000);
-      return () => clearTimeout(timer);
-    }
-  }, [tasks]);
+  
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const newTask = {
-      titre,
-      description,
-      priorité,
-      deadline,
-      statut,
-    };
-
+    const newTask = { titre, description, priorité, deadline, statut };
     addTask(newTask);
+
     setTitre("");
     setDescription("");
     setPriorité("MOYENNE");
     setDeadline("");
     setStatut("À FAIRE");
+    setSuccess("Task created successfully!");
+    navigate("/taches/kanban"); 
   };
 
   return (

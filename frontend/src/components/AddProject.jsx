@@ -44,7 +44,8 @@ const AddProject = () => {
             setTimeout(() => {
                 setError("");
             }, 3000);
-        }
+            navigate("/projets");
+        } 
     };
 
     const styles = {
