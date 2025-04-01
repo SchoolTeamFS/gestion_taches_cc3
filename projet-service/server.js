@@ -10,6 +10,7 @@ const app=express()
 app.use(express.json())
 app.use(cors())
 
+
 const {MONGODB_URL,DATABASE,PORT}=process.env
 
 mongoose.connect(`${MONGODB_URL}/${DATABASE}`)

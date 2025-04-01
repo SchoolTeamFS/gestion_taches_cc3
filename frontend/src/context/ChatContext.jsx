@@ -1,6 +1,47 @@
+// import { createContext, useContext, useEffect, useState } from 'react';
+// import { io } from 'socket.io-client';
+
+// const ChatContext = createContext();
+
+// export const ChatProvider = ({ children }) => {
+//   const [socket, setSocket] = useState(null);
+
+//   useEffect(() => {
+//     const newSocket = io('http://localhost:5005', {
+//       transports: ['websocket', 'polling']
+//     });
+
+//     setSocket(newSocket);
+
+//     return () => {
+//       newSocket.disconnect();
+//     };
+//   }, []);
+
+//   const joinProject = (projectId, userId) => {
+//     if (!socket) {
+//       console.error('Socket non initialisé');
+//       return;
+//     }
+//     socket.emit('joinRoom', { projectId, userId });
+//   };
+
+//   return (
+//     <ChatContext.Provider value={{ socket, joinProject }}>
+//       {children}
+//     </ChatContext.Provider>
+//   );
+// };
+
+// export const useChat = () => useContext(ChatContext);
+
+
+
+
+
 import { createContext, useEffect, useState, useContext } from "react";
 import { io } from "socket.io-client";
-import AuthContext from "../context/AuthContext"; 
+import AuthContext from "./AuthContext"; 
 
 export const ChatContext = createContext();
 

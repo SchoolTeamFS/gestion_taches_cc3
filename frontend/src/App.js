@@ -1,6 +1,8 @@
-import React from "react";
+
+
+import React, { useState,useEffect,useContext } from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import { AuthProvider } from "./context/AuthContext";
+import { AuthProvider } from "./context/AuthContext"; 
 import { TaskProvider } from "./context/TaskContext";
 import Header from "./components/Header";
 import Login from "./components/Login";
@@ -22,11 +24,14 @@ import AllCategories from "./components/AllCategories";
 import AddCategory from "./components/AddCategory";
 import AllUsers from "./components/AllUsers";
 import AddUser from "./components/AddUser";
+import UserProjects from "./components/UserProjects";
 import { ChatProvider } from "./context/ChatContext";
+import AuthContext from "./context/AuthContext";
 
 
 function App() {
- 
+//const userId = '67dc45e52ce2b7b80b1b89a2'
+
   return (
     
     <AuthProvider>
@@ -55,8 +60,10 @@ function App() {
             <Route path="/taches/manage" element={<PrivateRoute><TaskTable /></PrivateRoute>} />
             <Route path="/taches/kanban" element={<PrivateRoute><KanbanBoard /></PrivateRoute>} />
             <Route path="/chat" element={<PrivateRoute><Chat /></PrivateRoute>} />
+            {/* <Route path="/user/projects" element={<UserProjects userId={user.id} />} /> */}
+            {/* <Route path="/user/projects" element={<UserProjects />} />
 
-
+            <Route path="/chat/:id" element={<Chat />} /> */}
           </Routes>
         </div>
       </Router>
