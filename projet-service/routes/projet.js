@@ -52,7 +52,6 @@ router.delete("/deleteCategory/:id", verifytoken, async (req, res) => {
     const categoryId = req.params.id;
     const category = await Category.findById(categoryId);
     const associatedProjects = await Project.find({ categorie: category.nom });
-
     if (associatedProjects.length > 0) {
       return res.status(400).json({
         message: "Cannot delete category because it has associated projects.",
@@ -73,7 +72,6 @@ router.delete("/deleteCategory/:id", verifytoken, async (req, res) => {
 router.get("/all", verifytoken, async (req, res) => {
   try {
       const user = req.user;
-
       let projets;
       if (user.role === "admin") {
           projets = await Project.find();
@@ -98,12 +96,11 @@ router.post("/add", verifytoken, async (req, res) => {
   if (!req.user || !req.user.id) {
     return res.status(401).json({ message: "Unauthorized. User ID missing." });
   }
-
   try {
     const { nom, description, dateDebut, dateFin, statut, categorieNom } = req.body;
 
     const category = await Category.findOne({ nom: categorieNom });
-    if (!category) return res.status(404).json({ message: "Catégorie non trouvée" });
+    if (!category) return res.status(404).json({ message: "Catégorie non trouvée" })
 
     const newProject = new Project({
       nom,
@@ -115,7 +112,6 @@ router.post("/add", verifytoken, async (req, res) => {
       membre: [],
     });
     newProject.membre.push(user.id);
-
     await newProject.save();
     res.status(201).json(newProject);
   } catch (error) {
@@ -209,9 +205,9 @@ router.post("/enroll/:user_id/:projet_id", verifytoken, async (req, res) => {
     projet.membre.push(user_id);
     await projet.save();
 
-    console.log(`User ${userResponse.data.name} enrolled in project ${projet.nom}`);
     res.json({ message: `User ${userResponse.data.name} enrolled successfully`, user: userResponse.data });
-  } catch (error) {
+  } 
+  catch (error) {
     console.error("Error enrolling user:", error.response?.data || error.message);
     res.status(500).json({ message: "Error enrolling user", error: error.message });
   }
@@ -224,7 +220,6 @@ router.delete("/removeUser/:user_id/:projet_id", verifytoken, async (req, res) =
       headers: { Authorization: req.headers.authorization }
     });
     const project = await Project.findById(projet_id);
-
     if (!userResponse.data) {
       return res.status(404).json({ message: "User not found" });
     }
@@ -262,9 +257,6 @@ router.delete("/removeUser/:user_id", verifytoken, isAdmin, async (req, res) => 
       { membre: user_id },
       { $pull: { membre: user_id } }
     );
-
-  
-
     res.json({ message: `User ${user.name} removed from ${result.modifiedCount} projects` });
 
   } catch (error) {

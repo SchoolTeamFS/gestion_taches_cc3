@@ -7,7 +7,7 @@ const UserSchema = new mongoose.Schema( {
       "Please use a valid email address"
       ]},
     password: { type: String, required: [true, "Password is required"], minlength: 6, },
-    role: { type: String, enum: ["membre", "admin", "invite"], default: "admin" },
+    role: { type: String, enum: ["membre", "admin", "invite"], default: "membre" },
     isBlocked: { type: Boolean, default: false },
   },
   { timestamps: true }

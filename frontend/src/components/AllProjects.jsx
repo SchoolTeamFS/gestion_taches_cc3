@@ -8,16 +8,27 @@ import { MdGroupRemove } from "react-icons/md";
 
 const AllProjects = () => {
     const [projects, setProjects] = useState([]);
+    const [filteredProjects, setFilteredProjects] = useState([]);
     const [users, setUsers] = useState([]);
     const [error, setError] = useState("");
     const [message, setMessage] = useState("");
     const [isEditing, setIsEditing] = useState(null);
     const [updatedProject, setUpdatedProject] = useState({});
+    const [filters, setFilters] = useState({
+        nom: "",
+        dateDebut: "",
+        dateFin: "",
+        statut: ""
+    });
 
     useEffect(() => {
         fetchProjects();
-        fetchUsers()
+        fetchUsers();
     }, []);
+
+    useEffect(() => {
+        setFilteredProjects(projects);
+    }, [projects]);
 
     const fetchUsers = async (keyword = '') => {
         try {
@@ -53,7 +64,38 @@ const AllProjects = () => {
             console.error("Error fetching projects:", error.response?.data || error.message);
         }
     };
-    
+
+    const handleFilter = async () => {
+        try {
+            const token = localStorage.getItem("token");
+            const response = await proApi.get("/filter", {
+                headers: { Authorization: `Bearer ${token}` },
+                params: filters
+            });
+            
+            setFilteredProjects(response.data);
+        } catch (error) {
+            console.error("Error filtering projects:", error.response?.data || error.message);
+            setError("Error filtering projects");
+        }
+    };
+
+    const handleResetFilters = () => {
+        setFilters({
+            nom: "",
+            dateDebut: "",
+            dateFin: "",
+            statut: ""
+        });
+        setFilteredProjects(projects);
+    };
+
+    const handleFilterChange = (e) => {
+        setFilters({
+            ...filters,
+            [e.target.name]: e.target.value,
+        });
+    };
 
     const handleUpdate = async (projectId) => {
         try {
@@ -141,6 +183,60 @@ const AllProjects = () => {
             borderRadius: "8px",
             boxShadow: "0px 4px 10px rgba(0,0,0,0.1)",
         },
+        filterForm: {
+            backgroundColor: "#fff",
+            padding: "20px",
+            borderRadius: "8px",
+            boxShadow: "0px 4px 8px rgba(0,0,0,0.1)",
+            marginBottom: "20px"
+        },
+        filterRow: {
+            display: "flex",
+            flexWrap: "wrap",
+            gap: "15px",
+            marginBottom: "15px"
+        },
+        filterGroup: {
+            flex: "1",
+            minWidth: "200px"
+        },
+        filterLabel: {
+            display: "block",
+            marginBottom: "5px",
+            fontWeight: "bold"
+        },
+        filterInput: {
+            width: "100%",
+            padding: "8px",
+            borderRadius: "4px",
+            border: "1px solid #ddd"
+        },
+        filterSelect: {
+            width: "100%",
+            padding: "8px",
+            borderRadius: "4px",
+            border: "1px solid #ddd"
+        },
+        filterButtons: {
+            display: "flex",
+            gap: "10px"
+        },
+        filterButton: {
+            padding: "8px 15px",
+            backgroundColor: "#007BFF",
+            color: "white",
+            border: "none",
+            borderRadius: "4px",
+            cursor: "pointer"
+        },
+        resetButton: {
+            padding: "8px 15px",
+            backgroundColor: "#6c757d",
+            color: "white",
+            border: "none",
+            borderRadius: "4px",
+            cursor: "pointer"
+        },
         projectList: {
             listStyle: "none",
             paddingLeft: "0",
@@ -221,10 +317,80 @@ const AllProjects = () => {
                 <button style={styles.button}>Add Project</button>
             </NavLink>
             <h2>All Projects</h2>
+            
+            {/* Filter Form */}
+            <div style={styles.filterForm}>
+                <h3>Filter Projects</h3>
+                <div style={styles.filterRow}>
+                    <div style={styles.filterGroup}>
+                        <label style={styles.filterLabel}>Nom projet</label>
+                        <input
+                            type="text"
+                            name="nom"
+                            value={filters.nom}
+                            onChange={handleFilterChange}
+                            style={styles.filterInput}
+                            placeholder="Search by name"
+                        />
+                    </div>
+                    <div style={styles.filterGroup}>
+                        <label style={styles.filterLabel}>Status</label>
+                        <select
+                            name="statut"
+                            value={filters.statut}
+                            onChange={handleFilterChange}
+                            style={styles.filterSelect}
+                        >
+                            <option value="">All Status</option>
+                            <option value="En cours">En cours</option>
+                            <option value="Terminé">Terminé</option>
+                            <option value="En attente">En attente</option>
+                            <option value="Annulé">Annulé</option>
+                        </select>
+                    </div>
+                </div>
+                <div style={styles.filterRow}>
+                    <div style={styles.filterGroup}>
+                        <label style={styles.filterLabel}>Début</label>
+                        <input
+                            type="date"
+                            name="dateDebut"
+                            value={filters.dateDebut}
+                            onChange={handleFilterChange}
+                            style={styles.filterInput}
+                        />
+                    </div>
+                    <div style={styles.filterGroup}>
+                        <label style={styles.filterLabel}>Fin</label>
+                        <input
+                            type="date"
+                            name="dateFin"
+                            value={filters.dateFin}
+                            onChange={handleFilterChange}
+                            style={styles.filterInput}
+                        />
+                    </div>
+                </div>
+                <div style={styles.filterButtons}>
+                    <button 
+                        onClick={handleFilter}
+                        style={styles.filterButton}
+                    >
+                        Apply Filters
+                    </button>
+                    <button 
+                        onClick={handleResetFilters}
+                        style={styles.resetButton}
+                    >
+                        Reset Filters
+                    </button>
+                </div>
+            </div>
+
             {error && <p style={styles.error}>{error}</p>}
             {message && <p style={{ color: "green" }}>{message}</p>}
             <ul style={styles.projectList}>
-                {projects.map((project) => (
+                {filteredProjects.map((project) => (
                     <li key={project._id} style={styles.projectItem}>
                         {isEditing === project._id ? (
                             <div>
@@ -242,7 +408,7 @@ const AllProjects = () => {
                                     style={styles.selectField}
                                     required
                                 >
-                                    <option value="">Select Status</option>
+                                    <option value="">Status</option>
                                     <option value="En cours">En cours</option>
                                     <option value="Terminé">Terminé</option>
                                     <option value="En attente">En attente</option>
@@ -258,7 +424,15 @@ const AllProjects = () => {
                         ) : (
                             <div>
                                 <span style={styles.projectTitle}>{project.nom}</span>
-                                <p style={styles.projectStatus}>{project.statut}</p>
+                                <p style={styles.projectStatus}>
+                                    Status: {project.statut}
+                                    {project.dateDebut && (
+                                        <span> | Début: {new Date(project.dateDebut).toLocaleDateString()}</span>
+                                    )}
+                                    {project.dateFin && (
+                                        <span> | Fin: {new Date(project.dateFin).toLocaleDateString()}</span>
+                                    )}
+                                </p>
                                 <p style={styles.projectCategorie}>Categorie: {project.categorie}</p>
                                 <p>Enrolled in courses:</p>
                                 <ul>
@@ -271,7 +445,6 @@ const AllProjects = () => {
                                                     style={{ cursor: "pointer", color: "#DC3545", margin: "20px"}}
                                                 >
                                                     <MdGroupRemove />
-
                                                 </span>
                                             </li>
                                         ))
