@@ -434,7 +434,7 @@ const AllProjects = () => {
                                     )}
                                 </p>
                                 <p style={styles.projectCategorie}>Categorie: {project.categorie}</p>
-                                <p>Enrolled in courses:</p>
+                                <p>Equipe:</p>
                                 <ul>
                                     {Array.isArray(project?.membre) && project.membre.length > 0 ? (
                                         project.membre.map(userId => (
