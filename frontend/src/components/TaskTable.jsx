@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom"
+import { useNavigate } from "react-router-dom";
 import { useTaskContext } from "../context/TaskContext";
-import { updateTask, deleteTask } from "../api/taskApi";
+import { updateTask, deleteTask, addCommentToTask } from "../api/taskApi";
 
 const TaskTable = () => {
   const { tasks, fetchTasks, loading, error } = useTaskContext();
@@ -11,19 +11,21 @@ const TaskTable = () => {
     description: "",
     priorité: "MOYENNE",
     deadline: "",
-    statut: "À FAIRE", 
+    statut: "À FAIRE",
   });
-  const navigate = useNavigate(); 
+  const [commentInputs, setCommentInputs] = useState({});
+  const navigate = useNavigate();
 
   const navigateToAddTask = () => {
-    navigate("/taches/add"); 
+    navigate("/taches/add");
   };
   const navigateToKanban = () => {
-    navigate("/taches/kanban"); 
+    navigate("/taches/kanban");
   };
+
   useEffect(() => {
     fetchTasks();
-  }, [formData]);
+  }, []);
 
   const handleEdit = (task) => {
     setEditTaskId(task._id);
@@ -32,7 +34,7 @@ const TaskTable = () => {
       description: task.description,
       priorité: task.priorité,
       deadline: task.deadline ? new Date(task.deadline).toISOString().slice(0, 16) : "",
-      statut: task.statut, 
+      statut: task.statut,
     });
   };
 
@@ -40,13 +42,13 @@ const TaskTable = () => {
     try {
       await updateTask(editTaskId, formData);
       fetchTasks();
-      setEditTaskId(null); 
+      setEditTaskId(null);
       setFormData({
         titre: "",
         description: "",
         priorité: "MOYENNE",
         deadline: "",
-        statut: "À FAIRE", 
+        statut: "À FAIRE",
       });
     } catch (error) {
       console.error("Error updating task:", error);
@@ -71,8 +73,36 @@ const TaskTable = () => {
       description: "",
       priorité: "MOYENNE",
       deadline: "",
-      statut: "À FAIRE", 
+      statut: "À FAIRE",
     });
+  };
+
+  const handleCommentChange = (taskId, value) => {
+    setCommentInputs(prev => ({
+      ...prev,
+      [taskId]: value
+    }));
+  };
+
+  const handleAddComment = async (taskId) => {
+    try {
+      const token = "yourAuthToken";
+      await addCommentToTask(
+        taskId, 
+        { 
+          auteur: "User", 
+          contenu: commentInputs[taskId] || "" 
+        }, 
+        token
+      );
+      setCommentInputs(prev => ({
+        ...prev,
+        [taskId]: ""
+      }));
+      fetchTasks();
+    } catch (error) {
+      console.error("Error adding comment:", error);
+    }
   };
 
   if (loading) return <p>Loading tasks...</p>;
@@ -81,17 +111,15 @@ const TaskTable = () => {
   return (
     <div style={styles.container}>
       <h2 style={styles.title}>Task Table</h2>
-    <div>
-
-    <button onClick={navigateToAddTask} style={styles.addButton}>
+      <div>
+        <button onClick={navigateToAddTask} style={styles.addButton}>
           Add Task
         </button>
-       
+
         <span onClick={navigateToKanban} style={styles.backArrow}>
           ← Back to Kanban Board
         </span>
-     
-    </div>
+      </div>
 
       <table style={styles.table}>
         <thead>
@@ -102,6 +130,7 @@ const TaskTable = () => {
             <th style={styles.header}>Deadline</th>
             <th style={styles.header}>Statut</th>
             <th style={styles.header}>Actions</th>
+            <th style={styles.header}>Comments</th>
           </tr>
         </thead>
         <tbody>
@@ -181,6 +210,26 @@ const TaskTable = () => {
                   </>
                 )}
               </td>
+              <td style={styles.cell}>
+                <textarea
+                  value={commentInputs[task._id] || ""}
+                  onChange={(e) => handleCommentChange(task._id, e.target.value)}
+                  placeholder="Add a comment..."
+                  rows="3"
+                  style={styles.commentInput}
+                />
+                <button onClick={() => handleAddComment(task._id)} style={styles.commentButton}>
+                  Add Comment
+                </button>
+                <div>
+                  {task.comments && task.comments.map((comment, index) => (
+                    <div key={index} style={styles.comment}>
+                      <strong>{comment.auteur}: </strong>
+                      <span>{comment.contenu}</span>
+                    </div>
+                  ))}
+                </div>
+              </td>
             </tr>
           ))}
         </tbody>
@@ -189,10 +238,9 @@ const TaskTable = () => {
   );
 };
 
-
 const styles = {
   container: {
-    maxWidth: "800px",
+    maxWidth: "1000px",
     margin: "0 auto",
     padding: "20px",
     backgroundColor: "#ffffff",
@@ -212,9 +260,9 @@ const styles = {
     color: "#007bff",
     textDecoration: "none",
     cursor: "pointer",
-    float:'right',
-    marginButtom:"5%",
-    padding:'10px'
+    float: 'right',
+    marginButtom: "5%",
+    padding: '10px'
   },
   header: {
     backgroundColor: "#333",
@@ -251,7 +299,6 @@ const styles = {
     border: "none",
     borderRadius: "4px",
     cursor: "pointer",
-    
   },
   cancelButton: {
     padding: "5px 10px",
@@ -270,6 +317,25 @@ const styles = {
     cursor: "pointer",
     fontSize: "16px",
   },
+  commentInput: {
+    width: "100%",
+    marginBottom: "5px",
+  },
+  commentButton: {
+    padding: "5px 10px",
+    backgroundColor: "#17a2b8",
+    color: "#fff",
+    border: "none",
+    borderRadius: "4px",
+    cursor: "pointer",
+  },
+  comment: {
+    marginTop: "5px",
+    padding: "5px",
+    backgroundColor: "#f8f9fa",
+    borderRadius: "4px",
+    fontSize: "0.9em",
+  }
 };
 
 export default TaskTable;
