@@ -23,7 +23,7 @@ const TaskTable = () => {
   };
   useEffect(() => {
     fetchTasks();
-  }, []);
+  }, [formData]);
 
   const handleEdit = (task) => {
     setEditTaskId(task._id);

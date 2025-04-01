@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import proApi from "../api/proApi";
 import { NavLink } from "react-router-dom";
@@ -95,7 +96,6 @@ const AllProjects = () => {
             setTimeout(() => {
                 setError("");
             }, 3000);
-        } 
         }
     };
 
@@ -300,5 +300,6 @@ const AllProjects = () => {
             </ul>
         </div>
     );
+};
 
 export default AllProjects;
