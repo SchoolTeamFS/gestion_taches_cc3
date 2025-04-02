@@ -2,15 +2,22 @@ import '../styles/dashboardStyle.css';
 import { PiUsersThreeLight } from "react-icons/pi";
 import { useContext, useEffect, useState } from 'react';
 import authApi from '../api/authApi';
+import proApi from "../api/proApi";
 import AuthContext from '../context/AuthContext';
+import { useTaskContext } from "../context/TaskContext";
+import { FaTasks } from "react-icons/fa";
+import { LuFolders } from "react-icons/lu";
 
 const DashBoard = () => {
   const [users, setUsers] = useState([]);
   const [error, setError] = useState('');
+  const [projects, setProjects] = useState([]);
   const { user } = useContext(AuthContext);
+  const { tasks } = useTaskContext();
   
       useEffect(() => {
           fetchUsers();
+          fetchProjects();
       },[]);
   
       const fetchUsers = async () => {
@@ -27,9 +34,32 @@ const DashBoard = () => {
               console.log(error)
           }
       };
+      const fetchProjects = async () => {
+        try {
+            const token = localStorage.getItem("token");
+    
+            if (!token) {
+                console.error("No token found");
+                return;
+            }
+    
+            const response = await proApi.get("/all", {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+    
+            setProjects(response.data);
+        } catch (error) {
+            console.error("Error fetching projects:", error.response?.data || error.message);
+        }
+    };
       const totalUsers = users.length;
+      const totalTasks = tasks.length;
+      const totalProjet = projects.length;
       const types = [
         {type:'Users', total:totalUsers, icon:<PiUsersThreeLight/>},
+        {type:'Tasks', total:totalTasks, icon:<FaTasks />},
+        {type:'Projects', total:totalProjet, icon:<LuFolders/>},
+        
       ];
       return (
         <div className="dashboard">
